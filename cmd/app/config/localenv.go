@@ -7,7 +7,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func readEnv() {
+func localEnv() {
 
 	var envs map[string]string
 	envs, err := godotenv.Read("local.env")
