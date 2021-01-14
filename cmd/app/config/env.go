@@ -1,4 +1,4 @@
-package localenv
+package env
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func localEnv() {
+func localEnv() map[string]string {
 
 	var envs map[string]string
 	envs, err := godotenv.Read("local.env")
@@ -22,4 +22,5 @@ func localEnv() {
 	dbPort := envs["DB_PORT"]
 
 	fmt.Printf("name %s user %s pw %s port %s\n", dbName, dbUser, dbPass, dbPort)
+	return envs
 }
