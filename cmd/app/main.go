@@ -5,7 +5,7 @@ import (
 
 	"github.com/gofiber/fiber"
 	"github.com/jswiss/bookshelf/cmd/app/book"
-	"gorm.io/gorm"
+	"github.com/jswiss/bookshelf/database"
 )
 
 func helloWorld(c *fiber.Ctx) {
@@ -23,7 +23,7 @@ func setupRoutes(app *fiber.App) {
 
 func initDatabase() {
 	var err error
-	database.dbConnection, err = gorm.Open("sqlite3", "books.db")
+	conn, err = database.dbConnection()
 	if err != nil {
 		panic("failed to connect database")
 	}

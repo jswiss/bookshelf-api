@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/jswiss/bookshelf/config"
 	"github.com/jackc/pgx/v4"
 )
 
@@ -14,9 +15,9 @@ func dbConnection() {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
 		os.Exit(1)
 	}
-	// dbName := localenv.localEnv
+	dbName, dbUser, dbPass, dbPort := env.localEnv()
 
-	// fmt.Printf("db name is %s\n", dbName)
+	fmt.Printf("db name is %s\n", dbName)
 
 	defer conn.Close(context.Background())
 

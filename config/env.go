@@ -22,5 +22,5 @@ func localEnv() map[string]string {
 	dbPort := envs["DB_PORT"]
 
 	fmt.Printf("name %s user %s pw %s port %s\n", dbName, dbUser, dbPass, dbPort)
-	return envs
+	return dbName, dbUser, dbPass, dbPort
 }
