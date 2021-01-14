@@ -1,4 +1,4 @@
-package env
+package config
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func localEnv() map[string]string {
+func localEnv() (string, string, string, string) {
 
 	var envs map[string]string
 	envs, err := godotenv.Read("local.env")

@@ -15,9 +15,12 @@ func dbConnection() {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
 		os.Exit(1)
 	}
-	dbName, dbUser, dbPass, dbPort := env.localEnv()
+	dbName, dbUser, dbPass, dbPort := config.localEnv()
 
 	fmt.Printf("db name is %s\n", dbName)
+	fmt.Printf("db user is %s\n", dbUser)
+	fmt.Printf("db pass is %s\n", dbPass)
+	fmt.Printf("db port is %s\n", dbPort)
 
 	defer conn.Close(context.Background())
 
