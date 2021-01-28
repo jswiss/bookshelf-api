@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber"
-	"github.com/jswiss/bookshelf/cmd/app/book"
 	"github.com/jswiss/bookshelf/database"
+	"github.com/jswiss/bookshelf/routes/book"
 )
 
 func helloWorld(c *fiber.Ctx) {
@@ -23,7 +23,7 @@ func setupRoutes(app *fiber.App) {
 
 func initDatabase() {
 	var err error
-	conn, err = database.dbConnection()
+	database.DbConnection()
 	if err != nil {
 		panic("failed to connect database")
 	}
@@ -31,6 +31,7 @@ func initDatabase() {
 }
 
 func main() {
+	initDatabase()
 	app := fiber.New()
 
 	setupRoutes(app)

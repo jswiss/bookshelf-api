@@ -1,0 +1,59 @@
+version: '3.5'
+
+services:
+  # App Service
+  db:
+    build:
+      context: ./db-init
+      dockerfile: Dockerfile
+    container_name: bookshelf_postgres
+    env_file:
+      - ./local.env
+    volumes:
+       - db-data:/var/lib/postgresql/data:delegated
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+    restart: always
+
+  app:
+    container_name: bookshelf-api
+    # Configuration for building the docker image for the service
+    build:
+      context: . # Use an image built from the specified dockerfile in the current directory.
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000" # Forward the exposed port 8080 on the container to port 8080 on the host machine
+    restart: always
+    environment:
+      - PGDATABASE=bookshelf
+      - PGUSER=docker
+      - PGHOST=postgres
+      - PGPASSWORD=docker
+    depends_on:
+      - db # This service depends on postgres. Start that first.
+    networks: # Networks to join (Services on the same network can communicate with each other using their name)
+      - postgres
+
+  pgadmin:
+    container_name: bookshelf_pgadmin
+    image: dpage/pgadmin4
+    env_file:
+      - ./local.env
+    volumes:
+       - pgadmin:/root/.pgadmin
+    ports:
+      - "5555:80"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+    postgres:
+    pgadmin:
+    db-data:

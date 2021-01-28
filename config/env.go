@@ -7,7 +7,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func localEnv() (string, string, string, string) {
+// "LocalEnv - load local environment variables"
+func LocalEnv() (string, string, string) {
 
 	var envs map[string]string
 	envs, err := godotenv.Read("local.env")
@@ -16,11 +17,10 @@ func localEnv() (string, string, string, string) {
 		log.Fatal("Error loading .env file")
 	}
 
-	dbName := envs["DB_NAME"]
-	dbUser := envs["DB_USER"]
-	dbPass := envs["DB_PASS"]
-	dbPort := envs["DB_PORT"]
+	dbName := envs["POSTGRES_DB"]
+	dbUser := envs["POSTGRES_USER"]
+	dbPass := envs["POSTGRES_PASSWORD"]
 
-	fmt.Printf("name %s user %s pw %s port %s\n", dbName, dbUser, dbPass, dbPort)
-	return dbName, dbUser, dbPass, dbPort
+	fmt.Printf("name %s user %s pw %s", dbName, dbUser, dbPass)
+	return dbName, dbUser, dbPass
 }
