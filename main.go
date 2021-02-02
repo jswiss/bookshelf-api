@@ -3,27 +3,22 @@ package main
 import (
 	"fmt"
 
-	"github.com/gofiber/fiber"
-	"github.com/jswiss/bookshelf/database"
-	"github.com/jswiss/bookshelf/routes/book"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	_ "github.com/lib/pq"
+
+	"github.com/jswiss/bookshelf/app/database"
+	routes "github.com/jswiss/bookshelf/app/routes/book"
 )
 
-func helloWorld(c *fiber.Ctx) {
-	c.Send("Hello, World!")
-}
-
-func setupRoutes(app *fiber.App) {
-	app.Get("/", helloWorld)
-
-	app.Get("/api/v1/book", book.GetBooks)
-	app.Get("/api/v1/book/:id", book.GetBook)
-	app.Post("/api/v1/book", book.NewBook)
-	app.Delete("/api/v1/book/:id", book.DeleteBook)
+func helloWorld(c *fiber.Ctx) error {
+	return c.JSON(fiber.Map{"msg": "Hello, World!"})
 }
 
 func initDatabase() {
 	var err error
-	database.DbConnection()
+	database.Connect()
 	if err != nil {
 		panic("failed to connect database")
 	}
@@ -33,7 +28,16 @@ func initDatabase() {
 func main() {
 	initDatabase()
 	app := fiber.New()
+	app.Use(cors.New())
+	app.Use(logger.New())
 
-	setupRoutes(app)
-	app.Listen(3000)
+	routes.BookRoutes(app)
+
+	app.Use(func(c *fiber.Ctx) error {
+		if c.Is("json") {
+			return c.Next()
+		}
+		return c.SendString("Only JSON allowed!")
+	})
+	app.Listen("3000")
 }

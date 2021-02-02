@@ -33,6 +33,10 @@ CREATE TABLE IF NOT EXISTS borrowed_books(
 	  REFERENCES friends(id)
 );
 
+CREATE INDEX ON "books" ("title");
+CREATE INDEX ON "books" ("author");
+CREATE INDEX ON "friends" ("name");
+
 -- Add trigger to update in_stock when returned
 
 CREATE OR REPLACE FUNCTION trigger_set_timestamp()
