@@ -7,9 +7,8 @@ import (
 )
 
 type createBookRequest struct {
-	Title      string `json:"title" binding:required`
-	Author     string `json:"author" binding:required`
-	CoverImage string `json:"cover_image"`
+	Title  string `json:"title" binding:required`
+	Author string `json:"author" binding:required`
 }
 
 func (server *Server) createBook(ctx *gin.Context) {

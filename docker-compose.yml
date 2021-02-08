@@ -6,7 +6,7 @@ services:
     image: postgres:13
     container_name: bookshelf-postgres
     env_file:
-      - ./.env
+      - ./app.env
     volumes:
        - db-data:/var/lib/postgresql/data:delegated
     ports:
@@ -20,8 +20,10 @@ services:
     image: migrate/migrate
     volumes:
       - ./app/database/migrations:/app/database/migrations
-    command: -source=file://../app/database/migrations -database postgres://docker:docker@db:5432/bookshelf?sslmode=disable up
+    command: -source=file://../app/database/migrations -database postgresql://docker:docker@db:5432/bookshelf?sslmode=disable up
     restart: on-failure
+    depends_on:
+    - db # This service depends on postgres. Start that first.
     networks: # Networks to join (Services on the same network can communicate with each other using their name)
       - postgres
 
@@ -46,19 +48,6 @@ services:
       - db # This service depends on postgres. Start that first.
     networks: # Networks to join (Services on the same network can communicate with each other using their name)
       - postgres
-
-  pgadmin:
-    container_name: bookshelf_pgadmin
-    image: dpage/pgadmin4
-    env_file:
-      - ./.env
-    volumes:
-       - pgadmin:/root/.pgadmin
-    ports:
-      - "5555:80"
-    networks:
-      - postgres
-    restart: unless-stopped
 
 networks:
   postgres:

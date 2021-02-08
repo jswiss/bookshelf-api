@@ -1,10 +1,9 @@
 -- name: CreateBook :one
 INSERT INTO books (
   title,
-  author,
-  cover_image
-) VALUES (
-  $1, $2, $3
+  author
+  ) VALUES (
+  $1, $2
 ) RETURNING *;
 
 -- name: GetBook :one
@@ -17,5 +16,12 @@ ORDER BY id
 LIMIT $1
 OFFSET $2;
 
+-- name: UpdateBook :exec
+UPDATE books
+SET
+  title = $2,
+  author = $3
+WHERE id = $1;
+
 -- name: DeleteBook :exec
-DELETE  FROM books WHERE id = $1;
+DELETE FROM books WHERE id = $1;

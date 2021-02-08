@@ -10,6 +10,9 @@ type Store struct {
 	*Queries
 	db *sql.DB
 }
+
+type SQLStore struct {
+}
 type BorrowBookTxParams struct {
 	Book   int32 `json:"book"`
 	Friend int32 `json:"friend"`

@@ -7,13 +7,12 @@ import (
 )
 
 type Book struct {
-	ID         sql.NullInt32  `json:"id"`
-	Title      string         `json:"title"`
-	Author     string         `json:"author"`
-	CoverImage sql.NullString `json:"cover_image"`
-	InStock    sql.NullBool   `json:"in_stock"`
-	CreatedAt  sql.NullTime   `json:"created_at"`
-	UpdatedAt  sql.NullTime   `json:"updated_at"`
+	ID        sql.NullInt32 `json:"id"`
+	Title     string        `json:"title"`
+	Author    string        `json:"author"`
+	InStock   sql.NullBool  `json:"in_stock"`
+	CreatedAt sql.NullTime  `json:"created_at"`
+	UpdatedAt sql.NullTime  `json:"updated_at"`
 }
 
 type BorrowedBook struct {

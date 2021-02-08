@@ -1,28 +1,28 @@
-package database
+package main
 
 import (
-	"fmt"
+	"database/sql"
 	"log"
 
-	"github.com/jswiss/bookshelf/app/database"
+	db "github.com/jswiss/bookshelf/app/database/sqlc"
 	api "github.com/jswiss/bookshelf/app/server"
+	"github.com/jswiss/bookshelf/util"
 	_ "github.com/lib/pq"
-	db "github.com/techschool/simplebank/db/sqlc"
 )
 
-func initDatabase() {
-	var err error
-	database.Connect()
-	if err != nil {
-		panic("failed to connect database")
-	}
-	fmt.Println("Connection Opened to Database")
-}
-
 func main() {
-	initDatabase()
+	config, err := util.LoadConfig(".")
+	if err != nil {
+		log.Fatal("cannot load config:", err)
+	}
+
+	conn, err := sql.Open(config.DBDriver, config.DBSource)
+	if err != nil {
+		log.Fatal("cannot connect to db:", err)
+	}
+
 	store := db.NewStore(conn)
-	server, err := api.NewServer(config, store)
+	server, err := api.NewServer(config, *store)
 	if err != nil {
 		log.Fatal("cannot create server:", err)
 	}

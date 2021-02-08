@@ -2,18 +2,13 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"os"
 	"testing"
 
-	"github.com/jswiss/bookshelf/config"
+	"github.com/jswiss/bookshelf/util"
 	_ "github.com/lib/pq"
 )
-
-var dbUser, dbPass, dbName = config.LocalEnv()
-
-var dbSource = fmt.Sprintf("postgresql://{}:{}@db:5432/{}?sslmode=disable", dbUser, dbPass, dbName)
 
 const (
 	dbDriver = "postgres"
@@ -22,7 +17,8 @@ const (
 var testQueries *Queries
 
 func TestMain(m *testing.M) {
-	conn, err := sql.Open(dbDriver, dbSource)
+	config, err := util.LoadConfig(".")
+	conn, err := sql.Open(dbDriver, config.DBSource)
 	if err != nil {
 		log.Fatal("cannot connect to db:", err)
 	}

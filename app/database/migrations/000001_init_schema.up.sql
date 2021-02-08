@@ -2,7 +2,6 @@ CREATE TABLE IF NOT EXISTS books(
   id SERIAL UNIQUE,
   title VARCHAR(100) NOT NULL,
   author VARCHAR(100) NOT NULL,
-  cover_image VARCHAR,
   in_stock BOOLEAN default TRUE,
   created_at TIMESTAMP default NOW(),
   updated_at TIMESTAMP default NOW()
@@ -36,7 +35,7 @@ CREATE TABLE IF NOT EXISTS borrowed_books(
 
 CREATE INDEX ON "books" ("title");
 CREATE INDEX ON "books" ("author");
-CREATE INDEX ON "friends" ("name");
+CREATE INDEX ON "friends" ("full_name");
 
 -- Add trigger to update in_stock when returned
 
@@ -62,3 +61,17 @@ CREATE TRIGGER set_timestamp
 BEFORE UPDATE ON borrowed_books
 FOR EACH ROW
 EXECUTE PROCEDURE trigger_set_timestamp();
+
+CREATE OR REPLACE FUNCTION out_of_stock()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE books
+  SET in_stock = FALSE
+  WHERE id = NEW.book;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER change_stock_on_borrowed_insert
+AFTER INSERT ON borrowed_books
+FOR EACH ROW
+EXECUTE PROCEDURE out_of_stock();
