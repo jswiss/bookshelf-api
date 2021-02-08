@@ -1,20 +1,14 @@
-package main
+package database
 
 import (
 	"fmt"
-
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/logger"
-	_ "github.com/lib/pq"
+	"log"
 
 	"github.com/jswiss/bookshelf/app/database"
-	routes "github.com/jswiss/bookshelf/app/routes/book"
+	api "github.com/jswiss/bookshelf/app/server"
+	_ "github.com/lib/pq"
+	db "github.com/techschool/simplebank/db/sqlc"
 )
-
-func helloWorld(c *fiber.Ctx) error {
-	return c.JSON(fiber.Map{"msg": "Hello, World!"})
-}
 
 func initDatabase() {
 	var err error
@@ -27,17 +21,14 @@ func initDatabase() {
 
 func main() {
 	initDatabase()
-	app := fiber.New()
-	app.Use(cors.New())
-	app.Use(logger.New())
+	store := db.NewStore(conn)
+	server, err := api.NewServer(config, store)
+	if err != nil {
+		log.Fatal("cannot create server:", err)
+	}
 
-	routes.BookRoutes(app)
-
-	app.Use(func(c *fiber.Ctx) error {
-		if c.Is("json") {
-			return c.Next()
-		}
-		return c.SendString("Only JSON allowed!")
-	})
-	app.Listen("3000")
+	err = server.Start(config.ServerAddress)
+	if err != nil {
+		log.Fatal("cannot start server:", err)
+	}
 }

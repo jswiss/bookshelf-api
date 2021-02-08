@@ -10,17 +10,18 @@ CREATE TABLE IF NOT EXISTS books(
 
 CREATE TABLE IF NOT EXISTS friends(
   id SERIAL UNIQUE,
-  name VARCHAR(100) NOT NULL,
+  full_name VARCHAR(100) NOT NULL,
   phone INT,
   email VARCHAR UNIQUE,
+  photo VARCHAR,
   created_at TIMESTAMP default NOW(),
   updated_at TIMESTAMP default NOW()
 );
 
 CREATE TABLE IF NOT EXISTS borrowed_books(
   id SERIAL UNIQUE,
-  book INT,
-  friend INT,
+  book INT NOT NULL,
+  friend INT NOT NULL,
   borrowed_date TIMESTAMP default NOW(),
   returned_date TIMESTAMP,
   created_at TIMESTAMP default NOW(),
