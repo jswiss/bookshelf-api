@@ -3,7 +3,7 @@ packages:
   - name: "database"
     path: "./app/database/sqlc"
     queries: "./app/database/query/"
-    schema: "./app/database/migrations/"
+    schema: "./app/database/init/"
     engine: "postgresql"
     emit_json_tags: true
     emit_prepared_queries: false

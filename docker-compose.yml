@@ -8,9 +8,12 @@ services:
     env_file:
       - ./app.env
     volumes:
-       - db-data:/var/lib/postgresql/data:delegated
+       - postgres:/data/postgres
+       - ./app/database/init/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     ports:
       - "5432:5432"
+    expose:
+      - 5432
     networks:
       - postgres
     restart: always
@@ -35,7 +38,7 @@ services:
       context: . # Use an image built from the specified dockerfile in the current directory.
       dockerfile: Dockerfile
     ports:
-      - "3000:3000" # Forward the exposed port 8080 on the container to port 8080 on the host machine
+      - "3000:3000" # Forward the exposed port 3000 on the container to port 3000 on the host machine
     restart: always
     environment:
       - PGDATABASE=bookshelf
@@ -48,6 +51,8 @@ services:
       - db # This service depends on postgres. Start that first.
     networks: # Networks to join (Services on the same network can communicate with each other using their name)
       - postgres
+    expose:
+      - 3000
 
 networks:
   postgres:
@@ -56,5 +61,4 @@ networks:
 volumes:
   app:
   postgres:
-  pgadmin:
   db-data:
