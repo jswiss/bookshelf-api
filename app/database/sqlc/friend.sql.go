@@ -5,40 +5,28 @@ package database
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createFriend = `-- name: CreateFriend :one
 INSERT INTO friends (
   full_name,
-  phone,
-  email,
   photo
 ) VALUES (
-  $1, $2, $3, $4
-) RETURNING id, full_name, phone, email, photo, created_at, updated_at
+  $1, $2
+) RETURNING id, full_name, photo, created_at, updated_at
 `
 
 type CreateFriendParams struct {
-	FullName string         `json:"full_name"`
-	Phone    sql.NullInt32  `json:"phone"`
-	Email    sql.NullString `json:"email"`
-	Photo    sql.NullString `json:"photo"`
+	FullName string `json:"full_name"`
+	Photo    string `json:"photo"`
 }
 
 func (q *Queries) CreateFriend(ctx context.Context, arg CreateFriendParams) (Friend, error) {
-	row := q.db.QueryRowContext(ctx, createFriend,
-		arg.FullName,
-		arg.Phone,
-		arg.Email,
-		arg.Photo,
-	)
+	row := q.db.QueryRowContext(ctx, createFriend, arg.FullName, arg.Photo)
 	var i Friend
 	err := row.Scan(
 		&i.ID,
 		&i.FullName,
-		&i.Phone,
-		&i.Email,
 		&i.Photo,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -50,24 +38,22 @@ const deleteFriend = `-- name: DeleteFriend :exec
 DELETE  FROM friends WHERE id = $1
 `
 
-func (q *Queries) DeleteFriend(ctx context.Context, id sql.NullInt32) error {
+func (q *Queries) DeleteFriend(ctx context.Context, id int32) error {
 	_, err := q.db.ExecContext(ctx, deleteFriend, id)
 	return err
 }
 
 const getFriend = `-- name: GetFriend :one
-SELECT id, full_name, phone, email, photo, created_at, updated_at FROM friends
+SELECT id, full_name, photo, created_at, updated_at FROM friends
 WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetFriend(ctx context.Context, id sql.NullInt32) (Friend, error) {
+func (q *Queries) GetFriend(ctx context.Context, id int32) (Friend, error) {
 	row := q.db.QueryRowContext(ctx, getFriend, id)
 	var i Friend
 	err := row.Scan(
 		&i.ID,
 		&i.FullName,
-		&i.Phone,
-		&i.Email,
 		&i.Photo,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -76,7 +62,7 @@ func (q *Queries) GetFriend(ctx context.Context, id sql.NullInt32) (Friend, erro
 }
 
 const listFriends = `-- name: ListFriends :many
-SELECT id, full_name, phone, email, photo, created_at, updated_at FROM friends
+SELECT id, full_name, photo, created_at, updated_at FROM friends
 ORDER BY id
 LIMIT $1
 OFFSET $2
@@ -93,14 +79,12 @@ func (q *Queries) ListFriends(ctx context.Context, arg ListFriendsParams) ([]Fri
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Friend
+	items := []Friend{}
 	for rows.Next() {
 		var i Friend
 		if err := rows.Scan(
 			&i.ID,
 			&i.FullName,
-			&i.Phone,
-			&i.Email,
 			&i.Photo,
 			&i.CreatedAt,
 			&i.UpdatedAt,

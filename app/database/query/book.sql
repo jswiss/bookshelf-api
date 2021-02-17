@@ -1,9 +1,10 @@
 -- name: CreateBook :one
 INSERT INTO books (
   title,
-  author
+  author,
+  cover_image
   ) VALUES (
-  $1, $2
+  $1, $2, $3
 ) RETURNING *;
 
 -- name: GetBook :one
@@ -20,7 +21,8 @@ OFFSET $2;
 UPDATE books
 SET
   title = $2,
-  author = $3
+  author = $3,
+  cover_image = $4
 WHERE id = $1;
 
 -- name: DeleteBook :exec

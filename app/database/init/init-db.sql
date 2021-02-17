@@ -1,31 +1,29 @@
 CREATE TABLE IF NOT EXISTS books(
-  id SERIAL UNIQUE,
+  id SERIAL UNIQUE NOT NULL,
   title VARCHAR(100) NOT NULL,
   author VARCHAR(100) NOT NULL,
-  cover_image VARCHAR default NULL,
-  in_stock BOOLEAN default TRUE,
-  created_at TIMESTAMP default NOW(),
-  updated_at TIMESTAMP default NOW()
+  cover_image VARCHAR default 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmattsko.files.wordpress.com%2F2012%2F02%2Fbook-cover1500s.jpg&f=1&nofb=1' NOT NULL,
+  in_stock BOOLEAN default TRUE NOT NULL,
+  created_at TIMESTAMP default NOW() NOT NULL,
+  updated_at TIMESTAMP default NOW() NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS friends(
-  id SERIAL UNIQUE,
+  id SERIAL UNIQUE NOT NULL,
   full_name VARCHAR(100) NOT NULL,
-  phone INT,
-  email VARCHAR UNIQUE,
-  photo VARCHAR,
-  created_at TIMESTAMP default NOW(),
-  updated_at TIMESTAMP default NOW()
+  photo VARCHAR NOT NULL default '',
+  created_at TIMESTAMP default NOW() NOT NULL,
+  updated_at TIMESTAMP default NOW() NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS borrowed_books(
-  id SERIAL UNIQUE,
+  id SERIAL UNIQUE NOT NULL,
   book INT NOT NULL,
   friend INT NOT NULL,
-  borrowed_date TIMESTAMP default NOW(),
+  borrowed_date TIMESTAMP default NOW() NOT NULL,
   returned_date TIMESTAMP,
-  created_at TIMESTAMP default NOW(),
-  updated_at TIMESTAMP default NOW(),
+  created_at TIMESTAMP default NOW() NOT NULL,
+  updated_at TIMESTAMP default NOW() NOT NULL,
   CONSTRAINT fk_book
       FOREIGN KEY(book)
 	  REFERENCES books(id),

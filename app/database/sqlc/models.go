@@ -4,34 +4,33 @@ package database
 
 import (
 	"database/sql"
+	"time"
 )
 
 type Book struct {
-	ID         sql.NullInt32  `json:"id"`
-	Title      string         `json:"title"`
-	Author     string         `json:"author"`
-	CoverImage sql.NullString `json:"cover_image"`
-	InStock    sql.NullBool   `json:"in_stock"`
-	CreatedAt  sql.NullTime   `json:"created_at"`
-	UpdatedAt  sql.NullTime   `json:"updated_at"`
+	ID         int32     `json:"id"`
+	Title      string    `json:"title"`
+	Author     string    `json:"author"`
+	CoverImage string    `json:"cover_image"`
+	InStock    bool      `json:"in_stock"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
 }
 
 type BorrowedBook struct {
-	ID           sql.NullInt32 `json:"id"`
-	Book         int32         `json:"book"`
-	Friend       int32         `json:"friend"`
-	BorrowedDate sql.NullTime  `json:"borrowed_date"`
-	ReturnedDate sql.NullTime  `json:"returned_date"`
-	CreatedAt    sql.NullTime  `json:"created_at"`
-	UpdatedAt    sql.NullTime  `json:"updated_at"`
+	ID           int32        `json:"id"`
+	Book         int32        `json:"book"`
+	Friend       int32        `json:"friend"`
+	BorrowedDate time.Time    `json:"borrowed_date"`
+	ReturnedDate sql.NullTime `json:"returned_date"`
+	CreatedAt    time.Time    `json:"created_at"`
+	UpdatedAt    time.Time    `json:"updated_at"`
 }
 
 type Friend struct {
-	ID        sql.NullInt32  `json:"id"`
-	FullName  string         `json:"full_name"`
-	Phone     sql.NullInt32  `json:"phone"`
-	Email     sql.NullString `json:"email"`
-	Photo     sql.NullString `json:"photo"`
-	CreatedAt sql.NullTime   `json:"created_at"`
-	UpdatedAt sql.NullTime   `json:"updated_at"`
+	ID        int32     `json:"id"`
+	FullName  string    `json:"full_name"`
+	Photo     string    `json:"photo"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }

@@ -1,11 +1,9 @@
 -- name: CreateFriend :one
 INSERT INTO friends (
   full_name,
-  phone,
-  email,
   photo
 ) VALUES (
-  $1, $2, $3, $4
+  $1, $2
 ) RETURNING *;
 
 -- name: GetFriend :one

@@ -5,7 +5,6 @@ package database
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createBorrowedBook = `-- name: CreateBorrowedBook :one
@@ -41,7 +40,7 @@ const deleteBorrowedBook = `-- name: DeleteBorrowedBook :exec
 DELETE  FROM borrowed_books WHERE id = $1
 `
 
-func (q *Queries) DeleteBorrowedBook(ctx context.Context, id sql.NullInt32) error {
+func (q *Queries) DeleteBorrowedBook(ctx context.Context, id int32) error {
 	_, err := q.db.ExecContext(ctx, deleteBorrowedBook, id)
 	return err
 }
@@ -51,7 +50,7 @@ SELECT id, book, friend, borrowed_date, returned_date, created_at, updated_at FR
 WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetBorrowedBook(ctx context.Context, id sql.NullInt32) (BorrowedBook, error) {
+func (q *Queries) GetBorrowedBook(ctx context.Context, id int32) (BorrowedBook, error) {
 	row := q.db.QueryRowContext(ctx, getBorrowedBook, id)
 	var i BorrowedBook
 	err := row.Scan(
@@ -84,7 +83,7 @@ func (q *Queries) ListBorrowedBooks(ctx context.Context, arg ListBorrowedBooksPa
 		return nil, err
 	}
 	defer rows.Close()
-	var items []BorrowedBook
+	items := []BorrowedBook{}
 	for rows.Next() {
 		var i BorrowedBook
 		if err := rows.Scan(
@@ -115,7 +114,7 @@ SET returned_date = NOW()
 WHERE id = $1
 `
 
-func (q *Queries) UpdateBorrowedBook(ctx context.Context, id sql.NullInt32) error {
+func (q *Queries) UpdateBorrowedBook(ctx context.Context, id int32) error {
 	_, err := q.db.ExecContext(ctx, updateBorrowedBook, id)
 	return err
 }

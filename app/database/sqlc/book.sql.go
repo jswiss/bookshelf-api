@@ -5,14 +5,13 @@ package database
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createBook = `-- name: CreateBook :one
 INSERT INTO books (
   title,
   author,
-	cover_image
+  cover_image
   ) VALUES (
   $1, $2, $3
 ) RETURNING id, title, author, cover_image, in_stock, created_at, updated_at
@@ -25,7 +24,7 @@ type CreateBookParams struct {
 }
 
 func (q *Queries) CreateBook(ctx context.Context, arg CreateBookParams) (Book, error) {
-	row := q.db.QueryRowContext(ctx, createBook, arg.Title, arg.Author)
+	row := q.db.QueryRowContext(ctx, createBook, arg.Title, arg.Author, arg.CoverImage)
 	var i Book
 	err := row.Scan(
 		&i.ID,
@@ -43,7 +42,7 @@ const deleteBook = `-- name: DeleteBook :exec
 DELETE FROM books WHERE id = $1
 `
 
-func (q *Queries) DeleteBook(ctx context.Context, id sql.NullInt32) error {
+func (q *Queries) DeleteBook(ctx context.Context, id int32) error {
 	_, err := q.db.ExecContext(ctx, deleteBook, id)
 	return err
 }
@@ -53,7 +52,7 @@ SELECT id, title, author, cover_image, in_stock, created_at, updated_at FROM boo
 WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetBook(ctx context.Context, id sql.NullInt32) (Book, error) {
+func (q *Queries) GetBook(ctx context.Context, id int32) (Book, error) {
 	row := q.db.QueryRowContext(ctx, getBook, id)
 	var i Book
 	err := row.Scan(
@@ -86,7 +85,7 @@ func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]Book, e
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Book
+	items := []Book{}
 	for rows.Next() {
 		var i Book
 		if err := rows.Scan(
@@ -115,17 +114,24 @@ const updateBook = `-- name: UpdateBook :exec
 UPDATE books
 SET
   title = $2,
-  author = $3
+  author = $3,
+  cover_image = $4
 WHERE id = $1
 `
 
 type UpdateBookParams struct {
-	ID     sql.NullInt32 `json:"id"`
-	Title  string        `json:"title"`
-	Author string        `json:"author"`
+	ID         int32  `json:"id"`
+	Title      string `json:"title"`
+	Author     string `json:"author"`
+	CoverImage string `json:"cover_image"`
 }
 
 func (q *Queries) UpdateBook(ctx context.Context, arg UpdateBookParams) error {
-	_, err := q.db.ExecContext(ctx, updateBook, arg.ID, arg.Title, arg.Author)
+	_, err := q.db.ExecContext(ctx, updateBook,
+		arg.ID,
+		arg.Title,
+		arg.Author,
+		arg.CoverImage,
+	)
 	return err
 }
