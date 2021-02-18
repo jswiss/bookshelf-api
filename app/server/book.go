@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -9,9 +10,13 @@ import (
 )
 
 type createBookRequest struct {
-	Title      string `json:"title"`
-	Author     string `json:"author"`
+	Title      string `json:"title" binding:"required"`
+	Author     string `json:"author" binding:"required"`
 	CoverImage string `json:"cover_image"`
+}
+
+type getBookRequest struct {
+	ID int32 `uri:"id" binding:"required,min=1"`
 }
 
 type listBooksRequest struct {
@@ -41,6 +46,27 @@ func (server *Server) createBook(ctx *gin.Context) {
 				return
 			}
 		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, book)
+}
+
+func (server *Server) getBook(ctx *gin.Context) {
+	var req getBookRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	book, err := server.store.GetBook(ctx, req.ID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
