@@ -14,14 +14,14 @@ type Store struct {
 type SQLStore struct {
 }
 type BorrowBookTxParams struct {
-	Book   int32 `json:"book"`
-	Friend int32 `json:"friend"`
+	BookID   int32 `json:"book"`
+	FriendID int32 `json:"friend"`
 }
 
 type BorrowBookTxResult struct {
 	BorrowedBook BorrowedBook `json:borrowed_book`
-	Book         int32        `json:"book"`
-	Friend       int32        `json:"friend"`
+	BookID       int32        `json:"book_id"`
+	FriendID     int32        `json:"friend_id"`
 }
 
 func NewStore(db *sql.DB) *Store {
@@ -56,8 +56,8 @@ func (store *Store) BorrowBookTx(ctx context.Context, arg BorrowBookTxParams) (B
 		var err error
 
 		result.BorrowedBook, err = q.CreateBorrowedBook(ctx, CreateBorrowedBookParams{
-			Book:   arg.Book,
-			Friend: arg.Friend,
+			BookID:   arg.BookID,
+			FriendID: arg.FriendID,
 		})
 		if err != nil {
 			return err

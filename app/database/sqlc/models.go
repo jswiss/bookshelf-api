@@ -19,8 +19,8 @@ type Book struct {
 
 type BorrowedBook struct {
 	ID           int32        `json:"id"`
-	Book         int32        `json:"book"`
-	Friend       int32        `json:"friend"`
+	BookID       int32        `json:"book_id"`
+	FriendID     int32        `json:"friend_id"`
 	BorrowedDate time.Time    `json:"borrowed_date"`
 	ReturnedDate sql.NullTime `json:"returned_date"`
 	CreatedAt    time.Time    `json:"created_at"`

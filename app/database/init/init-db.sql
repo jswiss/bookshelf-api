@@ -18,17 +18,17 @@ CREATE TABLE IF NOT EXISTS friends(
 
 CREATE TABLE IF NOT EXISTS borrowed_books(
   id SERIAL UNIQUE NOT NULL,
-  book INT NOT NULL,
-  friend INT NOT NULL,
+  book_id INT NOT NULL,
+  friend_id INT NOT NULL,
   borrowed_date TIMESTAMP default NOW() NOT NULL,
   returned_date TIMESTAMP,
   created_at TIMESTAMP default NOW() NOT NULL,
   updated_at TIMESTAMP default NOW() NOT NULL,
-  CONSTRAINT fk_book
-      FOREIGN KEY(book)
+  CONSTRAINT fk_book_id
+      FOREIGN KEY(book_id)
 	  REFERENCES books(id),
-  CONSTRAINT fk_friend
-      FOREIGN KEY(friend)
+  CONSTRAINT fk_friend_id
+      FOREIGN KEY(friend_id)
 	  REFERENCES friends(id)
 );
 
@@ -66,7 +66,8 @@ RETURNS TRIGGER AS $$
 BEGIN
   UPDATE books
   SET in_stock = FALSE
-  WHERE id = NEW.book;
+  WHERE id = NEW.book_id;
+  RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 

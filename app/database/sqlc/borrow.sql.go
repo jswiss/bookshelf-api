@@ -5,29 +5,31 @@ package database
 
 import (
 	"context"
+	"database/sql"
+	"time"
 )
 
 const createBorrowedBook = `-- name: CreateBorrowedBook :one
 INSERT INTO borrowed_books (
-  book,
-  friend
+  book_id,
+  friend_id
 ) VALUES (
   $1, $2
-) RETURNING id, book, friend, borrowed_date, returned_date, created_at, updated_at
+) RETURNING id, book_id, friend_id, borrowed_date, returned_date, created_at, updated_at
 `
 
 type CreateBorrowedBookParams struct {
-	Book   int32 `json:"book"`
-	Friend int32 `json:"friend"`
+	BookID   int32 `json:"book_id"`
+	FriendID int32 `json:"friend_id"`
 }
 
 func (q *Queries) CreateBorrowedBook(ctx context.Context, arg CreateBorrowedBookParams) (BorrowedBook, error) {
-	row := q.db.QueryRowContext(ctx, createBorrowedBook, arg.Book, arg.Friend)
+	row := q.db.QueryRowContext(ctx, createBorrowedBook, arg.BookID, arg.FriendID)
 	var i BorrowedBook
 	err := row.Scan(
 		&i.ID,
-		&i.Book,
-		&i.Friend,
+		&i.BookID,
+		&i.FriendID,
 		&i.BorrowedDate,
 		&i.ReturnedDate,
 		&i.CreatedAt,
@@ -46,28 +48,44 @@ func (q *Queries) DeleteBorrowedBook(ctx context.Context, id int32) error {
 }
 
 const getBorrowedBook = `-- name: GetBorrowedBook :one
-SELECT id, book, friend, borrowed_date, returned_date, created_at, updated_at FROM borrowed_books
-WHERE id = $1 LIMIT 1
+SELECT bb.id, bb.book_id, bb.friend_id, bb.borrowed_date, bb.returned_date, b.title, b.author, f.full_name FROM borrowed_books bb
+INNER JOIN books b ON bb.book_id = b.id
+INNER JOIN friends f ON bb.friend_id = f.id
+WHERE bb.id = $1 LIMIT 1
 `
 
-func (q *Queries) GetBorrowedBook(ctx context.Context, id int32) (BorrowedBook, error) {
+type GetBorrowedBookRow struct {
+	ID           int32        `json:"id"`
+	BookID       int32        `json:"book_id"`
+	FriendID     int32        `json:"friend_id"`
+	BorrowedDate time.Time    `json:"borrowed_date"`
+	ReturnedDate sql.NullTime `json:"returned_date"`
+	Title        string       `json:"title"`
+	Author       string       `json:"author"`
+	FullName     string       `json:"full_name"`
+}
+
+func (q *Queries) GetBorrowedBook(ctx context.Context, id int32) (GetBorrowedBookRow, error) {
 	row := q.db.QueryRowContext(ctx, getBorrowedBook, id)
-	var i BorrowedBook
+	var i GetBorrowedBookRow
 	err := row.Scan(
 		&i.ID,
-		&i.Book,
-		&i.Friend,
+		&i.BookID,
+		&i.FriendID,
 		&i.BorrowedDate,
 		&i.ReturnedDate,
-		&i.CreatedAt,
-		&i.UpdatedAt,
+		&i.Title,
+		&i.Author,
+		&i.FullName,
 	)
 	return i, err
 }
 
 const listBorrowedBooks = `-- name: ListBorrowedBooks :many
-SELECT id, book, friend, borrowed_date, returned_date, created_at, updated_at FROM borrowed_books
-ORDER BY id
+SELECT bb.id, bb.book_id, bb.friend_id, bb.borrowed_date, bb.returned_date, b.title, b.author, f.full_name FROM borrowed_books bb
+INNER JOIN books b ON bb.book_id = b.id
+INNER JOIN friends f ON bb.friend_id = f.id
+ORDER BY bb.id
 LIMIT $1
 OFFSET $2
 `
@@ -77,23 +95,35 @@ type ListBorrowedBooksParams struct {
 	Offset int32 `json:"offset"`
 }
 
-func (q *Queries) ListBorrowedBooks(ctx context.Context, arg ListBorrowedBooksParams) ([]BorrowedBook, error) {
+type ListBorrowedBooksRow struct {
+	ID           int32        `json:"id"`
+	BookID       int32        `json:"book_id"`
+	FriendID     int32        `json:"friend_id"`
+	BorrowedDate time.Time    `json:"borrowed_date"`
+	ReturnedDate sql.NullTime `json:"returned_date"`
+	Title        string       `json:"title"`
+	Author       string       `json:"author"`
+	FullName     string       `json:"full_name"`
+}
+
+func (q *Queries) ListBorrowedBooks(ctx context.Context, arg ListBorrowedBooksParams) ([]ListBorrowedBooksRow, error) {
 	rows, err := q.db.QueryContext(ctx, listBorrowedBooks, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []BorrowedBook{}
+	items := []ListBorrowedBooksRow{}
 	for rows.Next() {
-		var i BorrowedBook
+		var i ListBorrowedBooksRow
 		if err := rows.Scan(
 			&i.ID,
-			&i.Book,
-			&i.Friend,
+			&i.BookID,
+			&i.FriendID,
 			&i.BorrowedDate,
 			&i.ReturnedDate,
-			&i.CreatedAt,
-			&i.UpdatedAt,
+			&i.Title,
+			&i.Author,
+			&i.FullName,
 		); err != nil {
 			return nil, err
 		}
