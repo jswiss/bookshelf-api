@@ -24,6 +24,25 @@ sqlc:
 		sqlc generate
 
 server:
-    go run main.go
+		go run main.go
+
+up:
+		@echo "=============starting api locally============="
+		docker-compose up -d
+
+logs:
+		docker-compose logs -f
+
+down:
+		docker-compose down
+
+test:
+		go test -v -cover ./...
+
+clean: down
+		@echo "=============cleaning up============="
+		rm -f api
+		docker system prune -f
+		docker volume prune -f
 
 .PHONY: postgres createdb dropdb migrateup migratedown sqlc test server

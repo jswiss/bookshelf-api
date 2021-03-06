@@ -28,7 +28,8 @@ func (server *Server) setupRouter() {
 	router := gin.Default()
 
 	router.POST("/books", server.createBook)
-	router.GET("/books/book/:id", server.getBook)
+	router.GET("/books/:id", server.getBook)
+	router.PUT("/books", server.updateBook)
 	router.GET("/books", server.listBooks)
 
 	// router.POST("/friends", server.CreateFriend)

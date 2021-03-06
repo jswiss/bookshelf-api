@@ -8,13 +8,11 @@ import (
 )
 
 const createBook = `-- name: CreateBook :one
-INSERT INTO books (
-  title,
-  author,
-  cover_image
-  ) VALUES (
-  $1, $2, $3
-) RETURNING id, title, author, cover_image, in_stock, created_at, updated_at
+
+INSERT INTO books (title, author, cover_image)
+VALUES ($1,
+        $2,
+        $3) RETURNING id, title, author, cover_image, in_stock, created_at, updated_at
 `
 
 type CreateBookParams struct {
@@ -39,7 +37,10 @@ func (q *Queries) CreateBook(ctx context.Context, arg CreateBookParams) (Book, e
 }
 
 const deleteBook = `-- name: DeleteBook :exec
-DELETE FROM books WHERE id = $1
+
+DELETE
+FROM books
+WHERE id = $1
 `
 
 func (q *Queries) DeleteBook(ctx context.Context, id int32) error {
@@ -48,8 +49,11 @@ func (q *Queries) DeleteBook(ctx context.Context, id int32) error {
 }
 
 const getBook = `-- name: GetBook :one
-SELECT id, title, author, cover_image, in_stock, created_at, updated_at FROM books
-WHERE id = $1 LIMIT 1
+
+SELECT id, title, author, cover_image, in_stock, created_at, updated_at
+FROM books
+WHERE id = $1
+LIMIT 1
 `
 
 func (q *Queries) GetBook(ctx context.Context, id int32) (Book, error) {
@@ -68,7 +72,9 @@ func (q *Queries) GetBook(ctx context.Context, id int32) (Book, error) {
 }
 
 const listBooks = `-- name: ListBooks :many
-SELECT id, title, author, cover_image, in_stock, created_at, updated_at FROM books
+
+SELECT id, title, author, cover_image, in_stock, created_at, updated_at
+FROM books
 ORDER BY id
 LIMIT $1
 OFFSET $2
@@ -111,12 +117,12 @@ func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]Book, e
 }
 
 const updateBook = `-- name: UpdateBook :exec
+
 UPDATE books
-SET
-  title = $2,
-  author = $3,
-  cover_image = $4
-WHERE id = $1
+SET title = $2,
+    author = $3,
+    cover_image = $4
+WHERE id = $1 RETURNING books.id, books.title, books.author, books.cover_image, books.in_stock, books.created_at, books.updated_at
 `
 
 type UpdateBookParams struct {
