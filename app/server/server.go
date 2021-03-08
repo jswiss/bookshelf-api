@@ -31,10 +31,13 @@ func (server *Server) setupRouter() {
 	router.GET("/books/:id", server.getBook)
 	router.PUT("/books", server.updateBook)
 	router.GET("/books", server.listBooks)
+	router.DELETE("/books/:id", server.deleteBook)
 
-	// router.POST("/friends", server.CreateFriend)
-	// router.GET("/friends/:id", server.getFriend)
-	// router.GET("/friends", server.getFriends)
+	router.POST("/friends", server.createFriend)
+	router.GET("/friends/:id", server.getFriend)
+	router.PUT("/friends", server.updateFriend)
+	router.GET("/friends", server.listFriends)
+	router.DELETE("/friends/:id", server.deleteFriend)
 
 	server.router = router
 }

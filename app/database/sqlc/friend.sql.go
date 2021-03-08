@@ -8,12 +8,10 @@ import (
 )
 
 const createFriend = `-- name: CreateFriend :one
-INSERT INTO friends (
-  full_name,
-  photo
-) VALUES (
-  $1, $2
-) RETURNING id, full_name, photo, created_at, updated_at
+
+INSERT INTO friends (full_name, photo)
+VALUES ($1,
+        $2) RETURNING id, full_name, photo, created_at, updated_at
 `
 
 type CreateFriendParams struct {
@@ -35,7 +33,10 @@ func (q *Queries) CreateFriend(ctx context.Context, arg CreateFriendParams) (Fri
 }
 
 const deleteFriend = `-- name: DeleteFriend :exec
-DELETE  FROM friends WHERE id = $1
+
+DELETE
+FROM friends
+WHERE id = $1
 `
 
 func (q *Queries) DeleteFriend(ctx context.Context, id int32) error {
@@ -44,8 +45,11 @@ func (q *Queries) DeleteFriend(ctx context.Context, id int32) error {
 }
 
 const getFriend = `-- name: GetFriend :one
-SELECT id, full_name, photo, created_at, updated_at FROM friends
-WHERE id = $1 LIMIT 1
+
+SELECT id, full_name, photo, created_at, updated_at
+FROM friends
+WHERE id = $1
+LIMIT 1
 `
 
 func (q *Queries) GetFriend(ctx context.Context, id int32) (Friend, error) {
@@ -62,7 +66,9 @@ func (q *Queries) GetFriend(ctx context.Context, id int32) (Friend, error) {
 }
 
 const listFriends = `-- name: ListFriends :many
-SELECT id, full_name, photo, created_at, updated_at FROM friends
+
+SELECT id, full_name, photo, created_at, updated_at
+FROM friends
 ORDER BY id
 LIMIT $1
 OFFSET $2
@@ -100,4 +106,23 @@ func (q *Queries) ListFriends(ctx context.Context, arg ListFriendsParams) ([]Fri
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateFriend = `-- name: UpdateFriend :exec
+
+UPDATE friends
+SET full_name = $2,
+    photo = $3
+WHERE id = $1 RETURNING friends.id, friends.full_name, friends.photo, friends.created_at, friends.updated_at
+`
+
+type UpdateFriendParams struct {
+	ID       int32  `json:"id"`
+	FullName string `json:"full_name"`
+	Photo    string `json:"photo"`
+}
+
+func (q *Queries) UpdateFriend(ctx context.Context, arg UpdateFriendParams) error {
+	_, err := q.db.ExecContext(ctx, updateFriend, arg.ID, arg.FullName, arg.Photo)
+	return err
 }
