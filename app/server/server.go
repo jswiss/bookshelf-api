@@ -39,6 +39,12 @@ func (server *Server) setupRouter() {
 	router.GET("/friends", server.listFriends)
 	router.DELETE("/friends/:id", server.deleteFriend)
 
+	router.POST("/borrowed-books", server.createBorrowedBook)
+	router.GET("/borrowed-books/:id", server.getBorrowedBook)
+	router.PUT("/borrowed-books", server.updateBorrowedBook)
+	router.GET("/borrowed-books", server.listBorrowedBooks)
+	router.DELETE("/borrowed-books/:id", server.deleteBorrowedBook)
+
 	server.router = router
 }
 
